@@ -13,11 +13,10 @@ read_files <- function(files_df) {
 }
 
 
-args = commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 if (length(args) == 0) {
   stop("At least two arguments must be supplied\n", call. = FALSE)
 }
-
 datadir <- args[1]
 destdatadir <- args[2]
 
@@ -70,7 +69,7 @@ for (datasetname in datasets) {
   }
 
   # Get list of files in data set directory
-  files <- get.files(datasetdir = datasetdir)
+  files <- get_files(datasetdir = datasetdir)
 
   for (dt in unique(files$date)) {
     # Build destination file path

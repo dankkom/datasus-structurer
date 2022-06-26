@@ -1,5 +1,5 @@
 #' Returns a data frame with the components of file names parsed
-parse.filenames <- function(files) {
+parse_filenames <- function(files) {
   file_stem <- fs::path_ext_remove(basename(files))
   file_parts <- stringr::str_split(file_stem, "_")
   datasetname <- unlist(lapply(file_parts, `[[`, 1))
@@ -12,7 +12,7 @@ parse.filenames <- function(files) {
 }
 
 
-get.files.year <- function(datadir, datasetname, year) {
+get_files_year <- function(datadir, datasetname, year) {
   pattern <- stringr::str_interp(
     "^${datasetname}_$[04d]{year}.*.dbc$")
   files <- list.files(
@@ -20,11 +20,11 @@ get.files.year <- function(datadir, datasetname, year) {
     pattern = pattern,
     full.names = TRUE
   )
-  parse.filenames(files)
+  parse_filenames(files)
 }
 
 
-get.files.yearmonth <- function(datadir, datasetname, year, month) {
+get_files_yearmonth <- function(datadir, datasetname, year, month) {
   pattern <- stringr::str_interp(
     "^${datasetname}_$[04d]{year}$[02d]{month}.*.dbc$")
   files <- list.files(
@@ -32,11 +32,11 @@ get.files.yearmonth <- function(datadir, datasetname, year, month) {
     pattern = pattern,
     full.names = TRUE
   )
-  parse.filenames(files)
+  parse_filenames(files)
 }
 
 
-get.files <- function(datasetdir) {
+get_files <- function(datasetdir) {
   files <- list.files(datasetdir, full.names = TRUE)
-  parse.filenames(files)
+  parse_filenames(files)
 }
