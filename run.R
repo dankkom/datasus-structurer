@@ -1,24 +1,10 @@
-source("R/get.files.R")
-
-
-read_files <- function(files_df) {
-  d <- data.frame()
-  for (filepath in files_df$filepath) {
-    if (stringr::str_detect(filepath, "br") & nrow(files_df) > 1) { next }
-    print(filepath)
-    d0 <- read.dbc::read.dbc(filepath, as.is = TRUE)
-    d <- dplyr::bind_rows(d, d0)
-  }
-  return(tibble::tibble(d))
-}
-
-
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) == 0) {
   stop("At least two arguments must be supplied\n", call. = FALSE)
 }
 datadir <- args[1]
 destdatadir <- args[2]
+
 
 datasets <- c(
   "sia-pa",
@@ -157,19 +143,28 @@ for (datasetname in datasets) {
   }
 
   # Get list of files in data set directory
-  files <- get_files(datasetdir = datasetdir)
+  files <- list.files(datasetdir, pattern = ".*\\.dbc", recursive = TRUE)
 
-  for (dt in unique(files$date)) {
+  for (f in files) {
     # Build destination file path
-    destfilename <- fs::path_ext_set(
-      paste(datasetname, basename(dt), sep = "_"),
+    destfilepath <- fs::path_ext_set(
+      file.path(
+        datasetdestdir,
+        fs::path_rel(f, start = datasetdir)
+      ),
       "parquet"
     )
-    destfilepath <- file.path(datasetdestdir, destfilename)
-    if (file.exists(destfilepath)) next
 
-    # Read dbc files
-    d <- read_files(dplyr::filter(files, date == dt))
+    if (!dir.exists(dirname(destfilepath))) {
+      # Create directory if it doesn't exists
+      dir.create(dirname(destfilepath))
+    } else if (file.exists(destfilepath)) {
+      # Skip loop if file exists
+      next
+    }
+
+    # Read DBC files
+    d <- tibble::tibble(read.dbc::read.dbc(f, as.is = TRUE))
 
     # Write parquet file
     arrow::write_parquet(d, destfilepath)
