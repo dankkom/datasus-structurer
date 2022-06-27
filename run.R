@@ -147,13 +147,8 @@ for (datasetname in datasets) {
 
   for (f in files) {
     # Build destination file path
-    destfilepath <- fs::path_ext_set(
-      file.path(
-        datasetdestdir,
-        fs::path_rel(f, start = datasetdir)
-      ),
-      "parquet"
-    )
+    srcfilepath <- file.path(datasetdir, f)
+    destfilepath <- fs::path_ext_set(file.path(datasetdestdir, f), "parquet")
 
     if (!dir.exists(dirname(destfilepath))) {
       # Create directory if it doesn't exists
@@ -164,7 +159,7 @@ for (datasetname in datasets) {
     }
 
     # Read DBC files
-    d <- tibble::tibble(read.dbc::read.dbc(f, as.is = TRUE))
+    d <- tibble::tibble(read.dbc::read.dbc(srcfilepath, as.is = TRUE))
 
     # Write parquet file
     arrow::write_parquet(d, destfilepath)
