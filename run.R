@@ -158,10 +158,22 @@ for (datasetname in datasets) {
       next
     }
 
-    # Read DBC files
-    d <- tibble::tibble(read.dbc::read.dbc(srcfilepath, as.is = TRUE))
+    print(paste("Converting file:", srcfilepath, "to", destfilepath))
 
-    # Write parquet file
-    arrow::write_parquet(d, destfilepath)
+    tryCatch(
+      {
+        # Read DBC files
+        d <- tibble::tibble(read.dbc::read.dbc(srcfilepath, as.is = TRUE))
+        # Write parquet file
+        arrow::write_parquet(d, destfilepath)
+      },
+      warning = function(w) {
+        print(paste("Warning:", w))
+      },
+      error = function(e) {
+        print(paste("Error:", e))
+      }
+    )
+    # end tryCatch
   }
 }
